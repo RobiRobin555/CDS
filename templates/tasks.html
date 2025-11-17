@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Nhiệm vụ - SmartSchedule.AI{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/tasks.css">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-title">✅ Quản lý nhiệm vụ</h1>
+        <button class="btn btn-primary" onclick="openTaskModal()">
+            ➕ Thêm nhiệm vụ
+        </button>
+    </div>
+
+    <!-- Filters -->
+    <div class="task-filters">
+        <button class="filter-btn active" data-filter="all">Tất cả</button>
+        <button class="filter-btn" data-filter="high">🔴 Ưu tiên cao</button>
+        <button class="filter-btn" data-filter="medium">🟡 Ưu tiên trung bình</button>
+        <button class="filter-btn" data-filter="low">🟢 Ưu tiên thấp</button>
+    </div>
+
+    <!-- Task Columns -->
+    <div class="task-columns">
+        <!-- Pending Tasks -->
+        <div class="task-column">
+            <div class="column-header">
+                <span class="column-title">📋 Chưa làm</span>
+                <span class="column-count" id="pendingCount">0</span>
+            </div>
+            <div class="task-list" id="pendingTasks" data-status="pending">
+                <!-- Tasks will be added here -->
+            </div>
+        </div>
+
+        <!-- In Progress Tasks -->
+        <div class="task-column">
+            <div class="column-header">
+                <span class="column-title">⏳ Đang làm</span>
+                <span class="column-count" id="inProgressCount">0</span>
+            </div>
+            <div class="task-list" id="inProgressTasks" data-status="in_progress">
+                <!-- Tasks will be added here -->
+            </div>
+        </div>
+
+        <!-- Completed Tasks -->
+        <div class="task-column">
+            <div class="column-header">
+                <span class="column-title">✅ Hoàn thành</span>
+                <span class="column-count" id="completedCount">0</span>
+            </div>
+            <div class="task-list" id="completedTasks" data-status="completed">
+                <!-- Tasks will be added here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Task Modal -->
+<div class="modal" id="taskModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modalTitle">➕ Thêm nhiệm vụ</h3>
+            <button class="close-btn" onclick="closeTaskModal()">&times;</button>
+        </div>
+
+        <form id="taskForm">
+            <input type="hidden" id="taskId">
+            
+            <div class="form-group">
+                <label class="form-label">Tiêu đề *</label>
+                <input type="text" class="form-input" id="taskTitle" placeholder="Hoàn thành bài tập Toán" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Mô tả</label>
+                <textarea class="form-textarea" id="taskDescription" placeholder="Chi tiết về nhiệm vụ..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Hạn chót</label>
+                <input type="datetime-local" class="form-input" id="taskDueDate">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Độ ưu tiên</label>
+                <select class="form-select" id="taskPriority">
+                    <option value="low">🟢 Thấp</option>
+                    <option value="medium" selected>🟡 Trung bình</option>
+                    <option value="high">🔴 Cao</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Trạng thái</label>
+                <select class="form-select" id="taskStatus">
+                    <option value="pending">📋 Chưa làm</option>
+                    <option value="in_progress">⏳ Đang làm</option>
+                    <option value="completed">✅ Hoàn thành</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                💾 Lưu nhiệm vụ
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/tasks.js"></script>
+{% endblock %}

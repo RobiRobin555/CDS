@@ -1,0 +1,224 @@
+/* ============================================
+   CALENDAR STYLES - Dashboard Page
+   ============================================ */
+
+/* Main Layout */
+.main-container {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 1.5rem;
+    padding: 2rem;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* Calendar Section */
+.calendar-section {
+    background: var(--white);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-md);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+/* Sidebar */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.widget {
+    background: var(--white);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-md);
+}
+
+.widget-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Today's Schedule */
+.schedule-item {
+    padding: 1rem;
+    border-left: 4px solid var(--primary);
+    background: var(--light);
+    border-radius: var(--radius-md);
+    margin-bottom: 0.75rem;
+    transition: transform 0.2s;
+}
+
+.schedule-item:hover {
+    transform: translateX(4px);
+}
+
+.schedule-time {
+    font-size: 0.875rem;
+    color: var(--dark-light);
+    font-weight: 600;
+}
+
+.schedule-subject {
+    font-weight: 600;
+    margin: 0.25rem 0;
+}
+
+.schedule-location {
+    font-size: 0.875rem;
+    color: var(--dark-light);
+}
+
+/* Quick Stats */
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+}
+
+.stat-box {
+    padding: 1rem;
+    background: var(--light);
+    border-radius: var(--radius-md);
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--dark-light);
+}
+
+/* Color Picker */
+.color-picker {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.color-option {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: transform 0.2s;
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+}
+
+.color-option.selected {
+    border-color: var(--dark);
+    box-shadow: 0 0 0 2px var(--white), 0 0 0 4px var(--dark);
+}
+
+/* FullCalendar Custom Styles */
+.fc {
+    font-family: var(--font-body);
+}
+
+.fc-event {
+    border: none !important;
+    padding: 4px 6px !important;
+    cursor: pointer;
+}
+
+.fc-daygrid-event {
+    margin-top: 2px !important;
+}
+
+.fc-button {
+    background: var(--primary) !important;
+    border: none !important;
+    text-transform: capitalize !important;
+}
+
+.fc-button:hover {
+    background: var(--primary-dark) !important;
+}
+
+.fc-button-active {
+    background: var(--primary-dark) !important;
+}
+
+.fc-daygrid-day-number {
+    color: var(--dark);
+    font-weight: 600;
+}
+
+.fc-col-header-cell {
+    background: var(--light);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    padding: 0.75rem 0;
+}
+
+.fc-daygrid-day.fc-day-today {
+    background: rgba(55, 136, 216, 0.1) !important;
+}
+
+/* Event Modal Specific */
+#eventModal .form-input[type="date"],
+#eventModal .form-input[type="time"] {
+    font-size: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .main-container {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-container {
+        padding: 1rem;
+    }
+
+    .calendar-section {
+        padding: 1rem;
+    }
+
+    .section-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .fc-header-toolbar {
+        font-size: 0.875rem;
+    }
+
+    .fc-button {
+        padding: 0.4rem 0.65rem !important;
+        font-size: 0.875rem !important;
+    }
+}

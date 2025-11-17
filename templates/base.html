@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SmartSchedule.AI - Quản lý lịch học thông minh cho sinh viên">
+    <meta name="author" content="SmartSchedule.AI Team">
+    <title>{% block title %}SmartSchedule.AI{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/static/images/favicon.svg">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/static/css/main.css">
+    {% block extra_css %}{% endblock %}
+    
+    <!-- PWA Manifest (Optional) -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#3788d8">
+</head>
+<body>
+    <script>
+        // Khôi phục theme sớm để tránh nháy giao diện
+        (function() {
+            try {
+                var saved = localStorage.getItem('theme') || 'system';
+                var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                var effective = saved === 'system' ? (prefersDark ? 'dark' : 'light') : saved;
+                document.documentElement.setAttribute('data-theme', effective === 'dark' ? 'dark' : 'light');
+            } catch (_) {}
+        })();
+    </script>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <a href="/dashboard.html" style="text-decoration: none; color: inherit;">
+                📚 SmartSchedule.AI
+            </a>
+        </div>
+        <div class="navbar-menu">
+            <a href="/dashboard.html" class="nav-link" data-page="dashboard">📅 Lịch học</a>
+            <a href="/tasks.html" class="nav-link" data-page="tasks">✅ Nhiệm vụ</a>
+            <a href="/research.html" class="nav-link" data-page="research">🔍 Nghiên cứu</a>
+            <a href="/import.html" class="nav-link" data-page="import">📥 Import</a>
+            <a href="/statistic.html" class="nav-link" data-page="statistic">📊 Thống kê</a>
+            <a href="/settings.html" class="nav-link" data-page="settings">⚙️ Cài đặt</a>
+            
+            <!-- User Dropdown -->
+            <div class="user-dropdown">
+                <div class="user-avatar" id="userAvatar">SV</div>
+                <div class="dropdown-menu" id="userDropdown">
+                    <div class="dropdown-item" id="userName">Người dùng</div>
+                    <div class="dropdown-divider"></div>
+                    <a href="/profile" class="dropdown-item">👤 Hồ sơ</a>
+                    <a href="/settings.html" class="dropdown-item">⚙️ Cài đặt</a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item" onclick="handleLogout(event)">🚪 Đăng xuất</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-menu-toggle" id="mobileMenuToggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </nav>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="/dashboard.html" class="mobile-menu-item">📅 Lịch học</a>
+        <a href="/tasks.html" class="mobile-menu-item">✅ Nhiệm vụ</a>
+        <a href="/research.html" class="mobile-menu-item">🔍 Nghiên cứu</a>
+        <a href="/import.html" class="mobile-menu-item">📥 Import</a>
+        <a href="/statistic.html" class="mobile-menu-item">📊 Thống kê</a>
+        <a href="/settings.html" class="mobile-menu-item">⚙️ Cài đặt</a>
+        <a href="/profile" class="mobile-menu-item">👤 Hồ sơ</a>
+        <a href="#" class="mobile-menu-item" onclick="handleLogout(event)">🚪 Đăng xuất</a>
+    </div>
+
+    <!-- Main Content -->
+    <main id="mainContent">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer (Optional) -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 SmartSchedule.AI. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="/about">Về chúng tôi</a>
+                <a href="/privacy">Chính sách</a>
+                <a href="/contact">Liên hệ</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Chatbot Widget -->
+    {% include 'components/chatbot.html' %}
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p>Đang tải...</p>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/static/js/utils.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <!-- Socket.IO client via CDN to ensure availability -->
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" crossorigin="anonymous"></script>
+    <script src="/static/js/notifications.js"></script>
+    {% block extra_js %}{% endblock %}
+
+    <script>
+        // Initialize auth check
+        checkAuth();
+        
+        // Set user info
+        const userName = localStorage.getItem('user_name');
+        const userEmail = localStorage.getItem('user_email');
+        
+        if(userName) {
+            document.getElementById('userAvatar').textContent = userName.charAt(0).toUpperCase();
+            const userNameElement = document.getElementById('userName');
+            if(userNameElement) {
+                userNameElement.textContent = userName;
+            }
+        }
+        
+        // User dropdown toggle
+        const userAvatar = document.getElementById('userAvatar');
+        const userDropdown = document.getElementById('userDropdown');
+        
+        if(userAvatar && userDropdown) {
+            userAvatar.addEventListener('click', function(e) {
+                e.stopPropagation();
+                userDropdown.classList.toggle('active');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function() {
+                userDropdown.classList.remove('active');
+            });
+        }
+        
+        // Mobile menu toggle
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        if(mobileMenuToggle && mobileMenu) {
+            mobileMenuToggle.addEventListener('click', function() {
+                this.classList.toggle('active');
+                mobileMenu.classList.toggle('active');
+                document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
+            });
+        }
+        
+        // Highlight active nav link
+        const currentPagePath = window.location.pathname.split('/').pop();
+        const currentPage = (currentPagePath || '').replace('.html', '') || 'dashboard';
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if(link.dataset.page === currentPage) {
+                link.classList.add('active');
+            }
+        });
+        
+        // Handle logout
+        function handleLogout(event) {
+            event.preventDefault();
+            if(confirm('Bạn có chắc muốn đăng xuất?')) {
+                localStorage.removeItem('jwt_token');
+                localStorage.removeItem('user_name');
+                localStorage.removeItem('user_email');
+                window.location.href = '/login.html';
+            }
+        }
+        
+        // Show/hide loading overlay
+        function showLoading() {
+            document.getElementById('loadingOverlay')?.classList.add('active');
+        }
+        
+        function hideLoading() {
+            document.getElementById('loadingOverlay')?.classList.remove('active');
+        }
+        
+        // Global error handler
+        window.addEventListener('error', function(e) {
+            console.error('Global error:', e.error);
+        });
+        
+        // Service Worker registration (PWA)
+        if('serviceWorker' in navigator) {
+            window.addEventListener('load', async function() {
+                try {
+                    const regs = await navigator.serviceWorker.getRegistrations();
+                    regs.forEach(r => r.unregister());
+                } catch (e) {
+                    console.log('Service Worker unregister failed', e);
+                }
+                try {
+                    const reg = await navigator.serviceWorker.register('/sw.js');
+                    console.log('Service Worker registered', reg.scope);
+                } catch (err) {
+                    console.log('Service Worker registration failed', err);
+                }
+            });
+        }
+    </script>
+    
+    <style>
+        /* Additional styles for base template */
+        .user-dropdown {
+            position: relative;
+        }
+        
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 50px;
+            right: 0;
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+            min-width: 200px;
+            z-index: 1000;
+        }
+        
+        .dropdown-menu.active {
+            display: block;
+            animation: fadeIn 0.2s ease;
+        }
+        
+        .dropdown-item {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: var(--dark);
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        
+        .dropdown-item:hover {
+            background: var(--light);
+        }
+        
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 0.5rem 0;
+        }
+        
+        /* Mobile Menu */
+        .mobile-menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 4px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        
+        .mobile-menu-toggle span {
+            width: 24px;
+            height: 3px;
+            background: var(--dark);
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+        
+        .mobile-menu-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+        
+        .mobile-menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .mobile-menu-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+        
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 60px;
+            left: 0;
+            width: 100%;
+            height: calc(100vh - 60px);
+            background: white;
+            z-index: 999;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        
+        .mobile-menu.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .mobile-menu-item {
+            display: block;
+            padding: 1rem;
+            color: var(--dark);
+            text-decoration: none;
+            border-bottom: 1px solid var(--border);
+            font-weight: 500;
+        }
+        
+        .mobile-menu-item:hover {
+            background: var(--light);
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--white);
+            border-top: 1px solid var(--border);
+            padding: 2rem;
+            margin-top: 4rem;
+            text-align: center;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+        
+        .footer-links a {
+            color: var(--dark-light);
+            text-decoration: none;
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+        
+        /* Loading Overlay */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: white;
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar-menu {
+                display: none;
+            }
+            
+            .mobile-menu-toggle {
+                display: flex;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</body>
+</html>

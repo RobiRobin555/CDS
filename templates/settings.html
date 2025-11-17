@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block title %}Cài đặt{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 1040px; margin: 0 auto; padding: 24px;">
+  <h1 style="margin-bottom: 16px;">⚙️ Cài đặt</h1>
+  <p style="color: var(--text-muted); margin-bottom: 16px;">Quản lý cài đặt hồ sơ, thông báo, giao diện và tài khoản.</p>
+
+  <!-- Thông báo inline -->
+  <div id="notification-container" style="position: relative;"></div>
+
+  <!-- Bố cục 2 cột: Sidebar + Nội dung -->
+  <div style="display:grid; grid-template-columns: 220px 1fr; gap: 16px; align-items:start;">
+    <!-- Sidebar điều hướng -->
+    <aside aria-label="Điều hướng cài đặt" style="position: sticky; top: 16px; align-self:start;">
+      <div class="card" style="padding:12px; border:1px solid var(--border-color); border-radius:8px; background: var(--bg-secondary);">
+        <nav style="display:flex; flex-direction:column; gap:8px;">
+          <a href="#profile" style="padding:8px 10px; border:1px solid var(--border-color); border-radius:6px; text-decoration:none; color: var(--text-primary); background: var(--bg-primary);">Hồ sơ</a>
+          <a href="#notifications" style="padding:8px 10px; border:1px solid var(--border-color); border-radius:6px; text-decoration:none; color: var(--text-primary); background: var(--bg-primary);">Thông báo</a>
+          <a href="#appearance" style="padding:8px 10px; border:1px solid var(--border-color); border-radius:6px; text-decoration:none; color: var(--text-primary); background: var(--bg-primary);">Giao diện</a>
+          <a href="#account" style="padding:8px 10px; border:1px solid var(--border-color); border-radius:6px; text-decoration:none; color: var(--text-primary); background: var(--bg-primary);">Tài khoản</a>
+        </nav>
+      </div>
+      <p style="color: var(--text-muted); font-size: 0.9em; margin-top:8px;">Mẹo: dùng thanh điều hướng để tới nhanh từng nhóm.</p>
+    </aside>
+
+    <!-- Nội dung chính -->
+    <div>
+      <form id="settings-form">
+        <!-- Hồ sơ -->
+        <section id="profile" style="scroll-margin-top: 80px;">
+          <div class="card" style="padding: 16px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-secondary);">
+            <h2 style="margin-top: 0;">Hồ sơ</h2>
+            <p style="color: var(--text-muted); margin-top:-4px;">Cập nhật tên hiển thị và Telegram username.</p>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-top:8px;">
+              <div>
+                <label for="name" style="display:block; margin-bottom:6px;">Tên hiển thị</label>
+                <input type="text" id="name" placeholder="Tên của bạn" style="width:100%; padding:8px; border:1px solid var(--border-color); border-radius:6px; background: var(--bg-primary); color: var(--text-primary);" />
+              </div>
+              <div>
+                <label for="telegram_id" style="display:block; margin-bottom:6px;">Telegram Username</label>
+                <input type="text" id="telegram_id" placeholder="VD: @username" style="width:100%; padding:8px; border:1px solid var(--border-color); border-radius:6px; background: var(--bg-primary); color: var(--text-primary);" />
+              </div>
+            </div>
+            <!-- Hiển thị username Telegram đã lưu -->
+            <div id="telegram-current" style="margin-top:8px; font-size: 0.95em; color: var(--text-muted);">
+              <span>Username Telegram hiện tại: </span>
+              <code id="telegram_current_value" style="color: var(--text-primary);"></code>
+              <span id="telegram_not_set" style="display:none;">Chưa liên kết</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Thông báo -->
+        <section id="notifications" style="scroll-margin-top: 80px; margin-top:16px;">
+          <div class="card" style="padding: 16px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-secondary);">
+            <h2 style="margin-top: 0;">Thông báo</h2>
+            <p style="color: var(--text-muted); margin-top:-4px;">Chọn kênh thông báo và thời gian nhắc.</p>
+            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; align-items:center; margin-top:8px;">
+              <label style="display:flex; align-items:center; gap:8px;">
+                <input type="checkbox" id="email_enabled" />
+                <span>Gửi email nhắc nhở</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:8px;">
+                <input type="checkbox" id="telegram_enabled" />
+                <span>Gửi Telegram nhắc nhở</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:8px;">
+                <input type="checkbox" id="in_app_enabled" />
+                <span>Thông báo trong ứng dụng</span>
+              </label>
+            </div>
+            <div style="margin-top:12px; display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+              <div>
+                <label for="email_reminder_offset" style="display:block; margin-bottom:6px;">Thời gian nhắc Email (phút)</label>
+                <input type="number" id="email_reminder_offset" min="0" max="10080" step="1" style="width:100%; padding:8px; border:1px solid var(--border-color); border-radius:6px; background: var(--bg-primary); color: var(--text-primary);" />
+              </div>
+              <div>
+                <label for="telegram_reminder_offset" style="display:block; margin-bottom:6px;">Thời gian nhắc Telegram (phút)</label>
+                <input type="number" id="telegram_reminder_offset" min="0" max="10080" step="1" style="width:100%; padding:8px; border:1px solid var(--border-color); border-radius:6px; background: var(--bg-primary); color: var(--text-primary);" />
+              </div>
+            </div>
+            <p style="color: var(--text-muted); margin-top:8px;">Gợi ý: 0 = ngay, 30 = 30 phút, 10080 = 7 ngày.</p>
+            <!-- Hướng dẫn Telegram đặt gần phần thông báo để dễ tìm -->
+            <div style="margin-top:12px; padding:10px; border:1px dashed var(--border-color); border-radius:6px; background: var(--bg-primary);">
+              <strong>Telegram:</strong>
+              <span> Mở bot <a href="https://t.me/ScheduleSmartAIbot" target="_blank">t.me/ScheduleSmartAIbot</a> và nhấn <strong>Start</strong> trước khi bật.</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Giao diện -->
+        <section id="appearance" style="scroll-margin-top: 80px; margin-top:16px;">
+          <div class="card" style="padding: 16px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-secondary);">
+            <h2 style="margin-top: 0;">Giao diện</h2>
+            <p style="color: var(--text-muted); margin-top:-4px;">Đổi chế độ màu và áp dụng ngay.</p>
+            <div style="display:flex; align-items:center; gap:16px; margin-top:8px;">
+              <label for="theme" style="display:block;">Chế độ màu</label>
+              <select id="theme" style="padding:8px; border:1px solid var(--border-color); border-radius:6px; background: var(--bg-primary); color: var(--text-primary);">
+                <option value="light">Sáng</option>
+                <option value="dark">Tối</option>
+                <option value="system">Theo hệ thống</option>
+              </select>
+              <button type="button" id="apply-theme" class="btn" style="padding:8px 12px; border:1px solid var(--border-color); border-radius:6px; background: var(--bg-secondary);">Áp dụng ngay</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tài khoản -->
+        <section id="account" style="scroll-margin-top: 80px; margin-top:16px;">
+          <div class="card" style="padding: 16px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-secondary);">
+            <h2 style="margin-top: 0;">Tài khoản</h2>
+            <p style="color: var(--text-muted); margin-top:-4px;">Quản lý bảo mật tài khoản.</p>
+            <div style="margin-top: 16px; display:flex; gap:12px; flex-wrap:wrap;">
+              <button type="button" id="change-password-btn" class="btn btn-primary" style="padding:8px 12px; border:1px solid var(--primary); border-radius:6px; background: var(--primary); color: white;">Đổi mật khẩu</button>
+              <button type="button" id="delete-account-btn" class="btn btn-danger" style="padding:8px 12px; border:1px solid var(--danger); border-radius:6px; background: var(--danger); color: white;">Xóa tài khoản</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Modals giữ nguyên để JS hoạt động -->
+        <div id="change-password-modal" class="modal" style="display:none; position:fixed; z-index:100; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4);">
+          <div class="modal-content" style="background:var(--white); margin:10% auto; padding:20px; border:1px solid var(--border); width:90%; max-width:500px; border-radius:8px;">
+            <h3 style="margin-top:0;">Đổi mật khẩu</h3>
+            <label for="old-password" style="display:block; margin-bottom:6px;">Mật khẩu cũ</label>
+            <input type="password" id="old-password" style="width:100%; padding:8px; margin-bottom:12px; border:1px solid var(--border); border-radius:6px; background: var(--white); color: var(--dark);">
+            <label for="new-password" style="display:block; margin-bottom:6px;">Mật khẩu mới</label>
+            <input type="password" id="new-password" style="width:100%; padding:8px; margin-bottom:12px; border:1px solid var(--border); border-radius:6px; background: var(--white); color: var(--dark);">
+            <label for="confirm-password" style="display:block; margin-bottom:6px;">Xác nhận mật khẩu mới</label>
+            <input type="password" id="confirm-password" style="width:100%; padding:8px; margin-bottom:20px; border:1px solid var(--border); border-radius:6px; background: var(--white); color: var(--dark);">
+            <div style="display:flex; justify-content:flex-end; gap:10px;">
+              <button type="button" id="cancel-change-password" class="btn" style="padding:8px 12px; border:1px solid var(--border); border-radius:6px; background: var(--light);">Hủy</button>
+              <button type="button" id="confirm-change-password" class="btn btn-primary" style="padding:8px 12px; border:1px solid var(--primary); border-radius:6px; background: var(--primary); color: white;">Xác nhận</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="delete-account-modal" class="modal" style="display:none; position:fixed; z-index:100; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4);">
+          <div class="modal-content" style="background:var(--white); margin:10% auto; padding:20px; border:1px solid var(--border); width:90%; max-width:400px; border-radius:8px;">
+            <h3 style="margin-top:0; color:var(--danger);">Xóa tài khoản</h3>
+            <p>Bạn có chắc chắn muốn xóa tài khoản? Hành động này không thể hoàn tác.</p>
+            <label for="delete-password" style="display:block; margin-bottom:6px;">Nhập mật khẩu để xác nhận</label>
+            <input type="password" id="delete-password" style="width:100%; padding:8px; margin-bottom:20px; border:1px solid var(--border); border-radius:6px; background: var(--white); color: var(--dark);">
+            <div style="display:flex; justify-content:flex-end; gap:10px;">
+              <button type="button" id="cancel-delete-account" class="btn" style="padding:8px 12px; border:1px solid var(--border); border-radius:6px; background: var(--light);">Hủy</button>
+              <button type="button" id="confirm-delete-account" class="btn btn-danger" style="padding:8px 12px; border:1px solid var(--danger); border-radius:6px; background: var(--danger); color: white;">Xác nhận xóa</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 16px; display:flex; gap:12px; flex-wrap:wrap;">
+          <button type="submit" class="btn btn-primary" style="padding:10px 16px; border:none; border-radius:6px; background: var(--primary); color: white;">Lưu cài đặt</button>
+          <button type="button" id="reset-settings" class="btn" style="padding:10px 16px; border:1px solid var(--border-color); border-radius:6px; background: var(--bg-secondary);">Khôi phục mặc định</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/settings.js"></script>
+{% endblock %}

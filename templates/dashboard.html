@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Lịch học - SmartSchedule.AI{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/calendar.css">
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="main-container">
+    <!-- Calendar Section -->
+    <div class="calendar-section">
+        <div class="section-header">
+            <h2 class="section-title">📅 Lịch học của bạn</h2>
+            <button class="btn btn-primary" onclick="openAddEventModal()">
+                ➕ Thêm lịch
+            </button>
+        </div>
+        <div id="calendar"></div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- Today's Schedule -->
+        <div class="widget">
+            <div class="widget-title">📋 Hôm nay</div>
+            <div id="todaySchedule">
+                <p style="color: #6b7280;">Đang tải...</p>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="widget">
+            <div class="widget-title">📊 Thống kê tuần này</div>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-number" id="weeklyClasses">0</div>
+                    <div class="stat-label">Tiết học</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="weeklySubjects">0</div>
+                    <div class="stat-label">Môn học</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="weeklyHours">0</div>
+                    <div class="stat-label">Giờ học</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="weeklyTasks">0</div>
+                    <div class="stat-label">Bài tập</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Exams -->
+        <div class="widget">
+            <div class="widget-title">⚠️ Sắp thi</div>
+            <div id="upcomingExams">
+                <p style="color: #6b7280;">Không có kỳ thi sắp tới</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Add/Edit Event Modal -->
+    <div class="modal" id="eventModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="eventModalTitle">➕ Thêm lịch học</h3>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+
+            <form id="eventForm">
+                <input type="hidden" id="eventId">
+                <div class="form-group">
+                    <label class="form-label">Môn học *</label>
+                    <input type="text" class="form-input" id="subject" placeholder="Toán Cao Cấp" required>
+                </div>
+
+            <div class="form-group">
+                <label class="form-label">Ngày *</label>
+                <input type="date" class="form-input" id="date" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Thời gian</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                    <input type="time" class="form-input" id="startTime" value="08:00">
+                    <input type="time" class="form-input" id="endTime" value="10:00">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Phòng học</label>
+                <input type="text" class="form-input" id="location" placeholder="A201">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Loại</label>
+                <select class="form-input" id="type">
+                    <option value="class">Lớp học</option>
+                    <option value="exam">Thi cử</option>
+                    <option value="meeting">Họp nhóm</option>
+                    <option value="other">Khác</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Lặp lại</label>
+                <select class="form-input" id="recurring">
+                    <option value="none">Không lặp</option>
+                    <option value="daily">Hàng ngày</option>
+                    <option value="weekly">Hàng tuần</option>
+                    <option value="monthly">Hàng tháng</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Màu sắc</label>
+                <div class="color-picker" id="colorPicker">
+                    <div class="color-option selected" data-color="#3788d8" style="background: #3788d8;"></div>
+                    <div class="color-option" data-color="#10b981" style="background: #10b981;"></div>
+                    <div class="color-option" data-color="#f59e0b" style="background: #f59e0b;"></div>
+                    <div class="color-option" data-color="#ef4444" style="background: #ef4444;"></div>
+                    <div class="color-option" data-color="#8b5cf6" style="background: #8b5cf6;"></div>
+                    <div class="color-option" data-color="#ec4899" style="background: #ec4899;"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Nhắc trước (phút)</label>
+                <input type="number" class="form-input" id="reminder" value="30" min="0">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr auto; gap: 0.5rem; align-items: center;">
+                <button type="submit" class="btn btn-primary" id="saveEventBtn" style="width: 100%; margin-top: 1rem;">
+                    💾 Lưu lịch
+                </button>
+                <button type="button" class="btn btn-danger" id="deleteEventBtn" style="margin-top: 1rem; display: none;">
+                    🗑️ Xóa
+                </button>
+            </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+<script src="/static/js/calendar.js"></script>
+{% endblock %}

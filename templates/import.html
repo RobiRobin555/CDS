@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Import Lịch - SmartSchedule.AI{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/import.css">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-title">📥 Import Lịch Học</h1>
+        <p class="page-subtitle">Nhập lịch từ file Excel hoặc PDF nhanh chóng</p>
+    </div>
+
+    <!-- Upload Section -->
+    <div class="upload-section">
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">📁</div>
+            <div class="upload-title">Kéo thả file hoặc click để chọn</div>
+            <div class="upload-subtitle">Hỗ trợ: .xlsx, .xls, .csv (tối đa 5MB)</div>
+            <input type="file" id="fileInput" class="file-input" accept=".xlsx,.xls,.csv">
+            <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                📂 Chọn file
+            </button>
+        </div>
+
+        <div class="instructions">
+            <div class="instructions-title">📋 Hướng dẫn format file Excel:</div>
+            <ul>
+                <li>Cột A: Môn học</li>
+                <li>Cột B: Ngày (YYYY-MM-DD)</li>
+                <li>Cột C: Giờ bắt đầu (HH:MM)</li>
+                <li>Cột D: Giờ kết thúc (HH:MM)</li>
+                <li>Cột E: Phòng học</li>
+                <li>Dòng đầu tiên là tiêu đề (sẽ bỏ qua)</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Template Download -->
+    <div class="template-section">
+        <div class="section-title">📄 Tải mẫu file</div>
+        <div class="template-grid">
+            <div class="template-card" onclick="downloadTemplate('excel')">
+                <div class="template-icon">📊</div>
+                <div class="template-name">Mẫu Excel (.xlsx)</div>
+            </div>
+            <div class="template-card" onclick="downloadTemplate('csv')">
+                <div class="template-icon">📋</div>
+                <div class="template-name">Mẫu CSV (.csv)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Đang xử lý file...</p>
+    </div>
+
+    <!-- Preview Section -->
+    <div class="preview-section" id="previewSection">
+        <div class="preview-header">
+            <div class="section-title">👁️ Xem trước dữ liệu</div>
+            <div class="preview-actions">
+                <button class="btn btn-outline" onclick="cancelImport()">❌ Hủy</button>
+                <button class="btn btn-secondary" onclick="confirmImport()">✅ Xác nhận import</button>
+            </div>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <div style="overflow-x: auto;">
+            <table class="preview-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Môn học</th>
+                        <th>Ngày</th>
+                        <th>Giờ bắt đầu</th>
+                        <th>Giờ kết thúc</th>
+                        <th>Phòng</th>
+                    </tr>
+                </thead>
+                <tbody id="previewTableBody">
+                    <!-- Data will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="/static/js/import.js"></script>
+{% endblock %}

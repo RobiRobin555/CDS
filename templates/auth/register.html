@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký - SmartSchedule.AI</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .register-container {
+            background: white;
+            border-radius: 1rem;
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .register-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .register-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .register-subtitle {
+            color: #6b7280;
+        }
+
+        .error-message, .success-message {
+            padding: 0.75rem;
+            border-radius: var(--radius-md);
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .success-message {
+            background: var(--secondary);
+            color: white;
+            border: 1px solid #059669;
+        }
+
+        .error-message.active, .success-message.active {
+            display: block;
+        }
+
+        .password-strength {
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .strength-bar {
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            margin-top: 0.25rem;
+            overflow: hidden;
+        }
+
+        .strength-fill {
+            height: 100%;
+            transition: width 0.3s, background 0.3s;
+        }
+
+        .strength-weak { width: 33%; background: #ef4444; }
+        .strength-medium { width: 66%; background: #f59e0b; }
+        .strength-strong { width: 100%; background: #10b981; }
+
+        .form-footer {
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+
+        .form-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .register-container {
+                padding: 2rem 1.5rem;
+                margin: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-header">
+            <div class="logo">📚</div>
+            <h1 class="register-title">SmartSchedule.AI</h1>
+            <p class="register-subtitle">Tạo tài khoản mới</p>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label class="form-label">Họ và tên *</label>
+                <input 
+                    type="text" 
+                    class="form-input" 
+                    id="name" 
+                    placeholder="Nguyễn Văn A"
+                    required
+                    minlength="2"
+                    autocomplete="name"
+                >
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email *</label>
+                <input 
+                    type="email" 
+                    class="form-input" 
+                    id="email" 
+                    placeholder="your.email@example.com"
+                    required
+                    autocomplete="email"
+                >
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Mật khẩu *</label>
+                <input 
+                    type="password" 
+                    class="form-input" 
+                    id="password" 
+                    placeholder="••••••••"
+                    required
+                    minlength="6"
+                    autocomplete="new-password"
+                >
+                <div class="password-strength">
+                    <div class="strength-bar">
+                        <div class="strength-fill" id="strengthFill"></div>
+                    </div>
+                    <span id="strengthText"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Xác nhận mật khẩu *</label>
+                <input 
+                    type="password" 
+                    class="form-input" 
+                    id="confirmPassword" 
+                    placeholder="••••••••"
+                    required
+                    autocomplete="new-password"
+                >
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;" id="registerButton">
+                ✨ Đăng ký
+            </button>
+        </form>
+
+        <div class="form-footer">
+            <p>Đã có tài khoản? <a href="/login.html">Đăng nhập ngay</a></p>
+        </div>
+    </div>
+
+    <script src="/static/js/utils.js"></script>
+    <script src="/static/js/auth.js"></script>
+    <script>
+        const registerForm = document.getElementById('registerForm');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const registerButton = document.getElementById('registerButton');
+        const passwordInput = document.getElementById('password');
+
+        // Check if already logged in
+        checkIfLoggedIn();
+
+        // Password strength indicator
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            const strength = calculatePasswordStrength(password);
+            const strengthFill = document.getElementById('strengthFill');
+            const strengthText = document.getElementById('strengthText');
+
+            strengthFill.className = 'strength-fill';
+            
+            if(strength <= 2) {
+                strengthFill.classList.add('strength-weak');
+                strengthText.textContent = 'Yếu';
+                strengthText.style.color = '#ef4444';
+            } else if(strength <= 4) {
+                strengthFill.classList.add('strength-medium');
+                strengthText.textContent = 'Trung bình';
+                strengthText.style.color = '#f59e0b';
+            } else {
+                strengthFill.classList.add('strength-strong');
+                strengthText.textContent = 'Mạnh';
+                strengthText.style.color = '#10b981';
+            }
+        });
+
+        // Handle form submit
+        registerForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = passwordInput.value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Use auth.js helper function
+            await handleRegister(
+                name, 
+                email, 
+                password, 
+                confirmPassword,
+                errorMessage,
+                successMessage,
+                registerButton
+            );
+        });
+    </script>
+</body>
+</html>

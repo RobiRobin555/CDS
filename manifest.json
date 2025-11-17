@@ -1,0 +1,15 @@
+{
+  "name": "SmartSchedule.AI",
+  "short_name": "ScheduleAI",
+  "start_url": "/dashboard.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3788d8",
+  "icons": [
+    {
+      "src": "/static/images/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
