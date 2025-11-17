@@ -54,3 +54,120 @@ SmartSchedule.AI là hệ thống quản lý lịch thông minh tích hợp các
 © 2025 AIoTLab, Faculty of Information Technology, DaiNam University. All rights reserved.
 
 ---
+
+## 🛠️ 6. Cài đặt & Chạy
+- Yêu cầu: `Python >= 3.11`, SQLite tích hợp sẵn
+- Tạo môi trường ảo và cài thư viện:
+  - `python -m venv .venv`
+  - `.venv\Scripts\Activate`
+  - `pip install flask flask-cors flask-socketio apscheduler python-dotenv requests werkzeug`
+- Khởi tạo CSDL và chạy server:
+  - `python app.py`
+- Biến môi trường quan trọng (đặt trong môi trường hệ thống hoặc file `.env` cục bộ):
+  - `FLASK_ENV=development`
+  - `DATABASE_PATH=smartschedule.db`
+  - `JWT_SECRET_KEY=<random-hex>`
+  - `SMTP_EMAIL=<your-email>`
+  - `SMTP_PASSWORD=<your-app-password>`
+  - `TELEGRAM_BOT_TOKEN=<bot-token>`
+  - `LLM_PROVIDER=groq|huggingface|ollama`
+  - `GROQ_API_KEY` hoặc `HF_API_KEY` tùy provider
+  - Lưu ý: Không commit các khóa bí mật lên GitHub.
+
+## 🗄️ 7. Schema CSDL (SQLite)
+```sql
+-- users
+CREATE TABLE IF NOT EXISTS users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  telegram_id TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- schedule
+CREATE TABLE IF NOT EXISTS schedule (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  subject TEXT NOT NULL,
+  description TEXT,
+  start_time DATETIME NOT NULL,
+  end_time DATETIME NOT NULL,
+  location TEXT,
+  type TEXT DEFAULT 'class',
+  recurring TEXT,
+  color TEXT DEFAULT '#3788d8',
+  reminder_time INTEGER DEFAULT 30,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- tasks
+CREATE TABLE IF NOT EXISTS tasks (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT,
+  due_date DATETIME,
+  priority TEXT DEFAULT 'medium',
+  status TEXT DEFAULT 'pending',
+  related_schedule_id INTEGER,
+  completed_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY(related_schedule_id) REFERENCES schedule(id) ON DELETE SET NULL
+);
+
+-- notifications
+CREATE TABLE IF NOT EXISTS notifications (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  schedule_id INTEGER,
+  message TEXT NOT NULL,
+  send_time DATETIME NOT NULL,
+  sent BOOLEAN DEFAULT 0,
+  channel TEXT DEFAULT 'email',
+  reminder_offset INTEGER,
+  event_type TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY(schedule_id) REFERENCES schedule(id) ON DELETE CASCADE
+);
+
+-- chat_history
+CREATE TABLE IF NOT EXISTS chat_history (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  user_msg TEXT NOT NULL,
+  ai_reply TEXT NOT NULL,
+  timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- notification_settings
+CREATE TABLE IF NOT EXISTS notification_settings (
+  user_id INTEGER PRIMARY KEY,
+  email_enabled BOOLEAN DEFAULT 1,
+  telegram_enabled BOOLEAN DEFAULT 0,
+  in_app_enabled BOOLEAN DEFAULT 1,
+  email_reminder_offset INTEGER DEFAULT 30,
+  telegram_reminder_offset INTEGER DEFAULT 30,
+  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- indexes
+CREATE INDEX IF NOT EXISTS idx_schedule_user ON schedule(user_id);
+CREATE INDEX IF NOT EXISTS idx_schedule_time ON schedule(start_time, end_time);
+CREATE INDEX IF NOT EXISTS idx_tasks_user ON tasks(user_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_schedule_offset ON notifications(schedule_id, reminder_offset);
+```
+
+## 🏗️ 8. Kiến trúc hệ thống
+- API Backend: Flask Blueprints `routes/*` cho auth, schedule, tasks, ai, notify, import, stats
+- Dịch vụ nền: APScheduler gửi nhắc việc đa kênh `services/notification_service.py`
+- Realtime: Flask-SocketIO `services/websocket_service.py` phát sự kiện tới từng người dùng
+- Tầng tiện ích: `utils/*` xử lý xác thực JWT, AI helper, parse file, validator, phát hiện xung đột
+- Dữ liệu: SQLite `smartschedule.db` khởi tạo bởi `models.init_database()`
+- Giao diện: `templates/*` và `static/*` (HTML/CSS/JS) tối giản phục vụ nghiên cứu
