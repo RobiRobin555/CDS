@@ -50,12 +50,8 @@ SmartSchedule.AI là hệ thống quản lý lịch thông minh tích hợp các
 - `models.py`: Khởi tạo DB và seed dữ liệu mẫu
 - `config.py`: Cấu hình hệ thống, CORS, upload, scheduler
 
-## 📝 5. License
-© 2025 AIoTLab, Faculty of Information Technology, DaiNam University. All rights reserved.
 
----
-
-## 🛠️ 6. Cài đặt & Chạy
+## 🛠️ 55. Cài đặt & Chạy
 - Yêu cầu: `Python >= 3.11`, SQLite tích hợp sẵn
 - Tạo môi trường ảo và cài thư viện:
   - `python -m venv .venv`
@@ -74,7 +70,7 @@ SmartSchedule.AI là hệ thống quản lý lịch thông minh tích hợp các
   - `GROQ_API_KEY` hoặc `HF_API_KEY` tùy provider
   - Lưu ý: Không commit các khóa bí mật lên GitHub.
 
-## 🗄️ 7. Schema CSDL (SQLite)
+## 🗄️ 66. Schema CSDL (SQLite)
 ```sql
 -- users
 CREATE TABLE IF NOT EXISTS users (
@@ -164,10 +160,14 @@ CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id);
 CREATE INDEX IF NOT EXISTS idx_notifications_schedule_offset ON notifications(schedule_id, reminder_offset);
 ```
 
-## 🏗️ 8. Kiến trúc hệ thống
+## 🏗️ 7. Kiến trúc hệ thống
 - API Backend: Flask Blueprints `routes/*` cho auth, schedule, tasks, ai, notify, import, stats
 - Dịch vụ nền: APScheduler gửi nhắc việc đa kênh `services/notification_service.py`
 - Realtime: Flask-SocketIO `services/websocket_service.py` phát sự kiện tới từng người dùng
 - Tầng tiện ích: `utils/*` xử lý xác thực JWT, AI helper, parse file, validator, phát hiện xung đột
 - Dữ liệu: SQLite `smartschedule.db` khởi tạo bởi `models.init_database()`
 - Giao diện: `templates/*` và `static/*` (HTML/CSS/JS) tối giản phục vụ nghiên cứu
+## 📝 8. License
+© 2025 AIoTLab, Faculty of Information Technology, DaiNam University. All rights reserved.
+
+---
