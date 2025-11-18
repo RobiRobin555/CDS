@@ -70,7 +70,7 @@ SmartSchedule.AI là hệ thống quản lý lịch thông minh tích hợp các
   - `GROQ_API_KEY` hoặc `HF_API_KEY` tùy provider
   - Lưu ý: Không commit các khóa bí mật lên GitHub.
 
-## 🗄️ 66. Schema CSDL (SQLite)
+## 🗄️ 6. Schema CSDL (SQLite)
 ```sql
 -- users
 CREATE TABLE IF NOT EXISTS users (
